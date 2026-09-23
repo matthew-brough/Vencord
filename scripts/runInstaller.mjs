@@ -20,6 +20,7 @@ import "./checkNodeVersion.js";
 
 import { execFileSync, execSync } from "child_process";
 import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync, cpSync, rmSync } from "fs";
+import { release } from "os";
 import { dirname, join } from "path";
 import { Readable } from "stream";
 import { finished } from "stream/promises";
@@ -27,11 +28,17 @@ import { fileURLToPath } from "url";
 
 const BASE_URL = "https://github.com/Vencord/Installer/releases/latest/download/";
 
+const IS_WSL = process.platform === "linux"
+    && (existsSync("/proc/sys/fs/binfmt_misc/WSLInterop") || /microsoft/i.test(release()));
+const TARGET_WINDOWS = IS_WSL && process.env.VENCORD_WSL_NATIVE !== "1";
+
 const BASE_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FILE_DIR = join(BASE_DIR, "dist", "Installer");
 const ETAG_FILE = join(FILE_DIR, "etag.txt");
 
 function getFilename() {
+    if (TARGET_WINDOWS) return "VencordInstallerCli.exe";
+
     switch (process.platform) {
         case "win32":
             return "VencordInstallerCli.exe";
@@ -85,7 +92,24 @@ async function ensureBinary() {
 
 
 
+function toWindowsPath(path) {
+    const winPath = execFileSync("wslpath", ["-w", path], { encoding: "utf-8" }).trim();
+    if (!winPath)
+        throw new Error(`wslpath failed to convert ${path} to a Windows path`);
+    return winPath;
+}
+
 const installerBin = await ensureBinary();
+
+const userDataDir = TARGET_WINDOWS ? toWindowsPath(BASE_DIR) : BASE_DIR;
+
+if (TARGET_WINDOWS) {
+    console.log("Detected WSL, targeting the Windows Discord install");
+    console.log("Using user data dir " + userDataDir);
+    if (userDataDir.startsWith("\\\\"))
+        console.log("This repo lives on the WSL filesystem, so Discord will load Vencord over \\\\wsl.localhost and needs WSL running. Cloning under /mnt/c avoids that.");
+    console.log("Set VENCORD_WSL_NATIVE=1 to install into a Discord running inside WSL instead.");
+}
 
 console.log("Now running Installer...");
 
@@ -97,7 +121,7 @@ try {
         stdio: "inherit",
         env: {
             ...process.env,
-            VENCORD_USER_DATA_DIR: BASE_DIR,
+            VENCORD_USER_DATA_DIR: userDataDir,
             VENCORD_DEV_INSTALL: "1"
         }
     });
