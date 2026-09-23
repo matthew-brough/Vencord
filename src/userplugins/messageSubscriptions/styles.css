@@ -1,0 +1,434 @@
+/* Inbox modal */
+
+.vc-msgsubs-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    padding-bottom: 8px;
+}
+
+/* Toolbar */
+
+.vc-msgsubs-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    background: var(--background-base-low);
+}
+
+.vc-msgsubs-toolbar-select {
+    flex: 0 1 220px;
+    min-width: 160px;
+}
+
+.vc-msgsubs-toolbar-search {
+    flex: 1 1 200px;
+    min-width: 140px;
+}
+
+.vc-msgsubs-toolbar-toggles {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* Hit list */
+
+.vc-msgsubs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+}
+
+.vc-msgsubs-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px 16px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.vc-msgsubs-load-more {
+    align-self: center;
+    margin: 8px 0;
+}
+
+/* Grouped sections */
+
+.vc-msgsubs-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-msgsubs-group-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 2px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    text-transform: uppercase;
+}
+
+/* Hit rows */
+
+.vc-msgsubs-row {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    background: var(--background-base-lower);
+    color: var(--text-default);
+    cursor: pointer;
+}
+
+.vc-msgsubs-row:hover {
+    background: var(--background-mod-subtle);
+}
+
+.vc-msgsubs-row:focus-visible {
+    outline: 2px solid var(--brand-500);
+    outline-offset: 2px;
+}
+
+.vc-msgsubs-row-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.vc-msgsubs-row-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.vc-msgsubs-row-unread {
+    box-shadow: inset 3px 0 0 0 var(--brand-500);
+}
+
+.vc-msgsubs-row-unread .vc-msgsubs-row-header {
+    color: var(--text-default);
+    font-weight: 600;
+}
+
+/* Row content */
+
+.vc-msgsubs-rule-tag {
+    flex: 0 0 auto;
+    max-width: 160px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--background-mod-subtle);
+    color: var(--text-default);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 16px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.vc-msgsubs-timestamp {
+    flex: 0 0 auto;
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 16px;
+}
+
+.vc-msgsubs-snippet {
+    color: var(--text-default);
+    font-size: 14px;
+    line-height: 18px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.vc-msgsubs-match {
+    padding: 0 2px;
+    border-radius: 3px;
+    background: color-mix(in oklab, var(--brand-500) 32%, transparent);
+    color: var(--text-default);
+    font-weight: 600;
+}
+
+.vc-msgsubs-avatar {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.vc-msgsubs-author {
+    flex: 0 0 auto;
+    max-width: 180px;
+    color: var(--text-default);
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.vc-msgsubs-muted {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-style: italic;
+}
+
+.vc-msgsubs-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.vc-msgsubs-rich {
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* Row actions */
+
+.vc-msgsubs-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.vc-msgsubs-actions:focus-within,
+.vc-msgsubs-row:hover .vc-msgsubs-actions,
+.vc-msgsubs-row:focus-within .vc-msgsubs-actions {
+    opacity: 1;
+}
+
+.vc-msgsubs-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.vc-msgsubs-action-btn:hover,
+.vc-msgsubs-action-btn:focus-visible {
+    background: var(--background-mod-subtle);
+    color: var(--text-default);
+}
+
+/* Rule editor */
+
+.vc-msgsubs-rule-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-msgsubs-rule-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    background: var(--background-base-lower);
+}
+
+.vc-msgsubs-rule-field {
+    display: flex;
+    flex: 1 1 160px;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 120px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.vc-msgsubs-rule-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.vc-msgsubs-scope-chips {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.vc-msgsubs-scope-chip {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+    max-width: 220px;
+    padding: 2px 4px 2px 8px;
+    border-radius: 10px;
+    background: var(--background-mod-subtle);
+    color: var(--text-default);
+    font-size: 12px;
+    line-height: 16px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.vc-msgsubs-scope-add {
+    flex: 0 0 auto;
+    padding: 2px 8px;
+    border: 1px dashed var(--border-subtle);
+    border-radius: 10px;
+    background: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 16px;
+    cursor: pointer;
+}
+
+.vc-msgsubs-scope-add:hover {
+    border-style: solid;
+    color: var(--text-default);
+}
+
+.vc-msgsubs-error {
+    flex-basis: 100%;
+    color: var(--text-feedback-critical);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.vc-msgsubs-add-rule {
+    align-self: flex-start;
+    margin-top: 4px;
+}
+
+/* Shared body (modal + native panel) */
+
+.vc-msgsubs-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+}
+
+.vc-msgsubs-body-compact {
+    gap: 6px;
+}
+
+/* Native inbox popout tab */
+
+.vc-msgsubs-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: 60vh;
+}
+
+.vc-msgsubs-panel-scroller {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 12px 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.vc-msgsubs-panel-footer {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.vc-msgsubs-panel .vc-msgsubs-toolbar {
+    background: var(--background-base-lower);
+}
+
+.vc-msgsubs-toolbar-compact {
+    gap: 6px;
+    padding: 8px 0 6px;
+    font-size: 12px;
+}
+
+.vc-msgsubs-toolbar-compact .vc-msgsubs-toolbar-select {
+    flex: 1 1 120px;
+    min-width: 96px;
+}
+
+.vc-msgsubs-toolbar-compact .vc-msgsubs-toolbar-search {
+    flex: 1 1 120px;
+    min-width: 96px;
+}
+
+.vc-msgsubs-toolbar-compact .vc-msgsubs-toolbar-toggles {
+    flex-basis: 100%;
+    margin-left: 0;
+}
+
+.vc-msgsubs-row-compact {
+    gap: 4px;
+    padding: 6px 8px;
+    border-radius: 6px;
+}
+
+.vc-msgsubs-row-compact .vc-msgsubs-snippet {
+    display: -webkit-box;
+    font-size: 13px;
+    line-height: 17px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+.vc-msgsubs-row-compact .vc-msgsubs-rule-tag {
+    max-width: 110px;
+}
+
+.vc-msgsubs-row-compact .vc-msgsubs-actions {
+    opacity: 1;
+}

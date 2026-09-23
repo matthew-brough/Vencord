@@ -19,7 +19,11 @@ lerna-debug.log*
 .pnpm-debug.log*
 *.tsbuildinfo
 
-src/userplugins
+# commit my plugins
+# src/userplugins
 
 ExtensionCache/
 /settings
+
+# AST_MCP symbol index
+.ast_mcp/
