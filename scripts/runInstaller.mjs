@@ -116,14 +116,23 @@ console.log("Now running Installer...");
 const argStart = process.argv.indexOf("--");
 const args = argStart === -1 ? [] : process.argv.slice(argStart + 1);
 
+const env = {
+    ...process.env,
+    VENCORD_USER_DATA_DIR: userDataDir,
+    VENCORD_DEV_INSTALL: "1"
+};
+
+// Windows binaries launched from WSL only inherit env vars named in WSLENV
+if (TARGET_WINDOWS) {
+    const shared = ["VENCORD_USER_DATA_DIR", "VENCORD_DEV_INSTALL"];
+    const existing = (env.WSLENV ?? "").split(":").filter(Boolean);
+    env.WSLENV = [...new Set([...existing, ...shared])].join(":");
+}
+
 try {
     execFileSync(installerBin, args, {
         stdio: "inherit",
-        env: {
-            ...process.env,
-            VENCORD_USER_DATA_DIR: userDataDir,
-            VENCORD_DEV_INSTALL: "1"
-        }
+        env
     });
 } catch {
     console.error("Something went wrong. Please check the logs above.");
