@@ -77,6 +77,7 @@ export function findMatch(text: string, rule: Rule): MatchResult | null {
 }
 
 export function ruleMatchesScope(rule: Rule, ctx: ScopeContext): boolean {
+    if (rule.blockedScopes?.some(scope => scopeMatches(scope, ctx))) return false;
     if (rule.scopes.length === 0) return true;
 
     return rule.scopes.some(scope => scopeMatches(scope, ctx));

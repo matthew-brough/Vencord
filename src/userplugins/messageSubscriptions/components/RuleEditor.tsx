@@ -30,6 +30,8 @@ const SNOWFLAKE_PATTERN = /^\d{17,20}$/;
 
 type MatchingFields = Partial<Pick<Rule, "term" | "mode" | "caseSensitive">>;
 
+type ScopeListKey = "scopes" | "blockedScopes";
+
 function makeRule(): Rule {
     return {
         id: crypto.randomUUID(),
@@ -39,7 +41,8 @@ function makeRule(): Rule {
         caseSensitive: false,
         enabled: true,
         notify: false,
-        scopes: []
+        scopes: [],
+        blockedScopes: []
     };
 }
 
@@ -90,18 +93,29 @@ function scopeById(id: string): Scope {
     return GuildStore.getGuild(id) ? { kind: "guild", id } : { kind: "channel", id };
 }
 
-function addScope(id: string, scope: Scope): void {
-    const rule = plainRules().find(existing => existing.id === id);
-    if (!rule || rule.scopes.some(existing => scopeKey(existing) === scopeKey(scope))) return;
-
-    updateRule(id, { scopes: [...rule.scopes, scope] });
+function scopesOf(rule: Rule, field: ScopeListKey): Scope[] {
+    return rule[field] ?? [];
 }
 
-function removeScope(id: string, scope: Scope): void {
+function setScopes(id: string, field: ScopeListKey, scopes: Scope[]): void {
+    updateRule(id, field === "scopes" ? { scopes } : { blockedScopes: scopes });
+}
+
+function addScope(id: string, field: ScopeListKey, scope: Scope): void {
     const rule = plainRules().find(existing => existing.id === id);
     if (!rule) return;
 
-    updateRule(id, { scopes: rule.scopes.filter(existing => scopeKey(existing) !== scopeKey(scope)) });
+    const scopes = scopesOf(rule, field);
+    if (scopes.some(existing => scopeKey(existing) === scopeKey(scope))) return;
+
+    setScopes(id, field, [...scopes, scope]);
+}
+
+function removeScope(id: string, field: ScopeListKey, scope: Scope): void {
+    const rule = plainRules().find(existing => existing.id === id);
+    if (!rule) return;
+
+    setScopes(id, field, scopesOf(rule, field).filter(existing => scopeKey(existing) !== scopeKey(scope)));
 }
 
 function Input({ initialValue, onChange, placeholder }: { placeholder: string; initialValue: string; onChange(value: string): void; }) {
@@ -155,33 +169,44 @@ function DeleteRuleModal({ rule, ...modalProps }: RenderModalProps & { rule: Rul
     );
 }
 
-function ScopeField({ rule }: { rule: Rule; }) {
+interface ScopeListProps {
+    rule: Rule;
+    field: ScopeListKey;
+    addLabel: string;
+    emptyLabel: string;
+    allowGlobal: boolean;
+}
+
+function ScopeList({ rule, field, addLabel, emptyLabel, allowGlobal }: ScopeListProps) {
     const [rawId, setRawId] = useState("");
     const { guild, channel } = useMemo(() => ({ guild: getCurrentGuild(), channel: getCurrentChannel() }), []);
+    const scopes = scopesOf(rule, field);
 
     return (
         <div className={cl("rule-field")}>
             <div className={cl("scope-chips")}>
-                {rule.scopes.length === 0
-                    ? <span className={cl("scope-chip")}>Global</span>
-                    : rule.scopes.map(scope => (
+                {scopes.length === 0
+                    ? <span className={cl("scope-chip")}>{emptyLabel}</span>
+                    : scopes.map(scope => (
                         <span key={scopeKey(scope)} className={cl("scope-chip")}>
                             {scopeLabel(scope)}
-                            <button aria-label={`Remove scope ${scopeLabel(scope)}`} onClick={() => removeScope(rule.id, scope)}>×</button>
+                            <button aria-label={`Remove ${scopeLabel(scope)}`} onClick={() => removeScope(rule.id, field, scope)}>×</button>
                         </span>
                     ))}
             </div>
             <div className={cl("scope-add")}>
-                <Span size="sm" weight="medium">Add scope</Span>
-                <Button size="small" variant="secondary" onClick={() => addScope(rule.id, { kind: "global" })}>Global</Button>
-                <Button size="small" variant="secondary" onClick={() => addScope(rule.id, { kind: "dm" })}>All DMs</Button>
+                <Span size="sm" weight="medium">{addLabel}</Span>
+                {allowGlobal && (
+                    <Button size="small" variant="secondary" onClick={() => addScope(rule.id, field, { kind: "global" })}>Global</Button>
+                )}
+                <Button size="small" variant="secondary" onClick={() => addScope(rule.id, field, { kind: "dm" })}>All DMs</Button>
                 {guild && (
-                    <Button size="small" variant="secondary" onClick={() => addScope(rule.id, { kind: "guild", id: guild.id })}>
+                    <Button size="small" variant="secondary" onClick={() => addScope(rule.id, field, { kind: "guild", id: guild.id })}>
                         This guild
                     </Button>
                 )}
                 {channel && (
-                    <Button size="small" variant="secondary" onClick={() => addScope(rule.id, { kind: "channel", id: channel.id })}>
+                    <Button size="small" variant="secondary" onClick={() => addScope(rule.id, field, { kind: "channel", id: channel.id })}>
                         This channel
                     </Button>
                 )}
@@ -196,7 +221,7 @@ function ScopeField({ rule }: { rule: Rule; }) {
                     variant="secondary"
                     disabled={!SNOWFLAKE_PATTERN.test(rawId)}
                     onClick={() => {
-                        addScope(rule.id, scopeById(rawId));
+                        addScope(rule.id, field, scopeById(rawId));
                         setRawId("");
                     }}
                 >
@@ -252,7 +277,20 @@ function RuleRow({ rule }: { rule: Rule; }) {
                 checked={rule.notify}
                 onChange={notify => updateRule(rule.id, { notify })}
             />
-            <ScopeField rule={rule} />
+            <ScopeList
+                rule={rule}
+                field="scopes"
+                addLabel="Watch scope"
+                emptyLabel="Global"
+                allowGlobal
+            />
+            <ScopeList
+                rule={rule}
+                field="blockedScopes"
+                addLabel="Blacklist scope"
+                emptyLabel="Nothing blacklisted"
+                allowGlobal={false}
+            />
             <div className={cl("rule-actions")}>
                 <Button
                     size="small"

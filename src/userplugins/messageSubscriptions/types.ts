@@ -21,6 +21,7 @@ export interface Rule {
     enabled: boolean;
     notify: boolean;
     scopes: Scope[];
+    blockedScopes?: Scope[];
 }
 
 export interface Hit {
