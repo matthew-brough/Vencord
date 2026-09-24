@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
 import { Checkbox, Select, TextInput, useEffect, useRef, useState } from "@webpack/common";
 
+import { exportHits } from "../export";
 import { settings } from "../settings";
-import { unreadCount } from "../store";
+import { getHits, unreadCount } from "../store";
 import type { HitFilter, Rule } from "../types";
 import { cl } from "../utils";
 
@@ -39,6 +41,13 @@ export function InboxToolbar({ filter, setFilter, rules, compact }: {
         );
     }
 
+    function exportScope() {
+        const { ruleId } = latestFilter.current;
+        const rule = ruleId ? rules.find(candidate => candidate.id === ruleId) : undefined;
+
+        exportHits(getHits(ruleId ? { ruleId } : undefined), rule ? rule.label || rule.term : "all");
+    }
+
     const options = [
         { label: `All (${unreadCount()} unread)`, value: ALL_RULES },
         ...rules.map(rule => ({
@@ -63,6 +72,17 @@ export function InboxToolbar({ filter, setFilter, rules, compact }: {
                 placeholder={compact ? "Search" : "Search snippets, authors, channels"}
                 onChange={onQueryChange}
             />
+
+            {!compact && (
+                <Button
+                    className={cl("toolbar-export")}
+                    size="small"
+                    variant="secondary"
+                    onClick={exportScope}
+                >
+                    Export JSONL
+                </Button>
+            )}
 
             <div className={cl("toolbar-toggles")}>
                 <Checkbox

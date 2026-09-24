@@ -11,8 +11,9 @@ import { openPluginModal } from "@components/settings";
 import { useCallback, useMemo, useState } from "@webpack/common";
 import type { JSX } from "react";
 
+import { exportHits } from "../export";
 import { settings } from "../settings";
-import { useHits } from "../store";
+import { getHits, useHits } from "../store";
 import type { Hit, HitFilter, Rule } from "../types";
 import { cl } from "../utils";
 import { HitRow } from "./HitRow";
@@ -136,7 +137,19 @@ export function InboxBody({ variant, state, onNavigate }: {
                             ))}
                         >
                             <span className={cl("group-header")}>
-                                {group[0].ruleLabel} ({group.length}, {countUnread(group)} unread)
+                                <span>{group[0].ruleLabel} ({group.length}, {countUnread(group)} unread)</span>
+
+                                <Button
+                                    className={cl("group-export")}
+                                    size="xs"
+                                    variant="secondary"
+                                    onClick={event => {
+                                        event.stopPropagation();
+                                        exportHits(getHits({ ruleId: group[0].ruleId }), group[0].ruleLabel);
+                                    }}
+                                >
+                                    Export
+                                </Button>
                             </span>
                         </ExpandableSection>
                     ))

@@ -32,6 +32,10 @@
     min-width: 140px;
 }
 
+.vc-msgsubs-toolbar-export {
+    flex: 0 0 auto;
+}
+
 .vc-msgsubs-toolbar-toggles {
     display: flex;
     flex: 0 0 auto;
@@ -77,6 +81,7 @@
 
 .vc-msgsubs-group-header {
     display: flex;
+    flex: 1;
     align-items: center;
     gap: 6px;
     padding: 4px 2px;
@@ -85,6 +90,11 @@
     font-weight: 600;
     line-height: 16px;
     text-transform: uppercase;
+}
+
+.vc-msgsubs-group-export {
+    margin-left: auto;
+    text-transform: none;
 }
 
 /* Hit rows */

@@ -7,7 +7,7 @@
 import { classNameFactory } from "@utils/css";
 import { Logger } from "@utils/Logger";
 import type { Channel, Guild, User } from "@vencord/discord-types";
-import { closeAllModals, GuildStore, NavigationRouter } from "@webpack/common";
+import { ChannelStore, closeAllModals, GuildStore, NavigationRouter } from "@webpack/common";
 
 import { markRead } from "./store";
 import { type Hit, MAX_SNIPPET_LENGTH } from "./types";
@@ -15,13 +15,29 @@ import { type Hit, MAX_SNIPPET_LENGTH } from "./types";
 export const cl = classNameFactory("vc-msgsubs-");
 export const logger = new Logger("MessageSubscriptions", "#a3e635");
 
-export function describeChannel(channel: Channel): { channelLabel: string; guildName: string | null; } {
+export function describeChannel(channel: Channel): Pick<Hit, "channelLabel" | "guildName" | "threadName"> {
     const guild: Guild | undefined = channel.guild_id ? GuildStore.getGuild(channel.guild_id) : undefined;
 
-    if (channel.isDM()) return { channelLabel: `DM — ${channel.rawRecipients?.[0]?.username ?? "Unknown"}`, guildName: null };
-    if (channel.isGroupDM()) return { channelLabel: `Group — ${channel.name || channel.rawRecipients?.map(r => r.username).join(", ") || "Unnamed"}`, guildName: null };
+    if (channel.isDM()) return { channelLabel: `DM — ${channel.rawRecipients?.[0]?.username ?? "Unknown"}`, guildName: null, threadName: null };
+    if (channel.isGroupDM()) return { channelLabel: `Group — ${channel.name || channel.rawRecipients?.map(r => r.username).join(", ") || "Unnamed"}`, guildName: null, threadName: null };
 
-    return { channelLabel: `#${channel.name}`, guildName: guild?.name ?? null };
+    if (channel.isThread()) {
+        const parent: Channel | undefined = channel.parent_id ? ChannelStore.getChannel(channel.parent_id) : undefined;
+
+        return {
+            channelLabel: parent ? `#${parent.name}` : "#unknown",
+            guildName: guild?.name ?? null,
+            threadName: channel.name
+        };
+    }
+
+    return { channelLabel: `#${channel.name}`, guildName: guild?.name ?? null, threadName: null };
+}
+
+export function locationOf(hit: Hit): string {
+    return [hit.guildName, hit.channelLabel, hit.threadName && `thread:${hit.threadName}`]
+        .filter((part): part is string => !!part)
+        .join(" — ");
 }
 
 export function describeAuthor(author: User): { authorName: string; authorAvatar: string | null; } {

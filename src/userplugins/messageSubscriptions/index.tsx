@@ -99,7 +99,7 @@ function handleMessage(message: GatewayMessage) {
         isPrivate: channel.isPrivate()
     };
 
-    const { channelLabel, guildName } = describeChannel(channel);
+    const { channelLabel, guildName, threadName } = describeChannel(channel);
     const { authorName, authorAvatar } = describeAuthor(message.author);
     const timestamp = message.timestamp ? new Date(message.timestamp).getTime() : Date.now();
 
@@ -120,6 +120,7 @@ function handleMessage(message: GatewayMessage) {
             guildId: channel.guild_id ?? null,
             channelLabel,
             guildName,
+            threadName,
             authorId: message.author.id,
             authorName,
             authorAvatar,

@@ -33,6 +33,7 @@ export interface Hit {
     guildId: string | null;
     channelLabel: string;
     guildName: string | null;
+    threadName: string | null;
     authorId: string;
     authorName: string;
     authorAvatar: string | null;
@@ -66,5 +67,5 @@ export interface StoredMeta {
     schema: number;
 }
 
-export const SCHEMA_VERSION = 1;
-export const MAX_SNIPPET_LENGTH = 500;
+export const SCHEMA_VERSION = 2;
+export const MAX_SNIPPET_LENGTH = 4000;
