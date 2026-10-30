@@ -5,7 +5,7 @@
  */
 
 import { saveFile } from "@utils/web";
-import { Toasts } from "@webpack/common";
+import { showToast } from "@webpack/common";
 
 import { settings } from "./settings";
 import type { Hit } from "./types";
@@ -76,21 +76,17 @@ export function fileNameFor(label: string): string {
     return `message-subscriptions-${slugify(label)}-${new Date().toISOString().slice(0, 10)}.jsonl`;
 }
 
-function toast(message: string, type: string) {
-    Toasts.show({ message, type, id: Toasts.genId() });
-}
-
 export function exportHits(hits: Hit[], label: string): void {
     if (!hits.length) {
-        toast("Nothing to export", Toasts.Type.MESSAGE);
+        showToast({ text: "Nothing to export" });
         return;
     }
 
     try {
         saveFile(new File([toJsonl(hits)], fileNameFor(label), { type: MIME_TYPE }));
-        toast(`Exported ${hits.length} hit${hits.length === 1 ? "" : "s"}`, Toasts.Type.SUCCESS);
+        showToast({ text: `Exported ${hits.length} hit${hits.length === 1 ? "" : "s"}`, variant: "success" });
     } catch (e) {
         logger.error("Failed to export hits", e);
-        toast("Export failed (check console)", Toasts.Type.FAILURE);
+        showToast({ text: "Export failed (check console)", variant: "critical" });
     }
 }
